@@ -53,11 +53,38 @@ function App() {
 
   // Crear la función que guarda las tareas
 
-  const agregarTarea = () => {
+  /*const agregarTarea = () => {
     if (tarea.trim() !== "") {
       setTareas([...tareas, tarea]); // "..." (spread operator) hace una copi de lo queya se encuentra en tareas para que no se pierda el valor que ya estaba
       setTarea("");
     }
+  };*/
+
+  const agregarTarea = () => {
+    if (tarea.trim() !== "") {
+      const nuevaTareaObj = {
+        id: Date.now(), // tiempo actual como ID único
+        texto: tarea,
+        completada: false
+      };
+      setTareas([...tareas, nuevaTareaObj]);
+      setTarea("");
+    }
+  };
+
+  const eliminarTarea = (id) => {
+    const nuevasTareas = tareas.filter((t) => t.id !== id);
+    setTareas(nuevasTareas);
+  };
+
+  const finalizarTarea = (id) => {
+    const nuevasTareas = tareas.map((t) => {
+      if (t.id === id) {
+        return { ...t, completada: !t.completada };
+      }
+      return t;
+    });
+    setTareas(nuevasTareas);
   };
 
   return (
@@ -118,9 +145,36 @@ function App() {
       <Boton label="Agregar tarea" onClick={agregarTarea} />
 
       <h2>Lista de tareas:</h2>
-      <ul>
-        {tareas.map((tarea, index) => (
-          <li key={index}>{tarea}</li>
+      <ul className="list-group">
+        {tareas.map((t) => (
+          <li
+            key={t.id}
+            className="list-group-item d-flex justify-content-between align-items-center"
+          >
+            <span
+              style={{ textDecoration: t.completada ? "line-through" : "none" }}
+            >
+              {t.texto}
+            </span>
+
+            <div>
+              <button
+                className={`btn btn-sm me-2 ${
+                  t.completada ? "btn-warning" : "btn-success"
+                }`}
+                onClick={() => finalizarTarea(t.id)}
+              >
+                {t.completada ? "Reabrir" : "Finalizar"}
+              </button>
+
+              <button
+                className="btn btn-danger btn-sm"
+                onClick={() => eliminarTarea(t.id)}
+              >
+                Eliminar
+              </button>
+            </div>
+          </li>
         ))}
       </ul>
     </>
